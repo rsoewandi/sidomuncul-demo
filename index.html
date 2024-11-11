@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+            position: relative; /* Position relative to allow absolute positioning of spinner/overlay */
+            min-height: 100vh; /* Ensure full viewport height */
+        }
+        h1 {
+            text-align: center;
+            color: #6DBE45; /* Light Green */
+            margin-top: 50px;
+        }
+        form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-top: 30px;
+        }
+        input[type="file"] {
+            padding: 10px;
+            border: 2px solid #D1B49A; /* Light Brown Border */
+            border-radius: 5px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #6DBE45; /* Light Green */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #5a9a3b; /* Slightly Darker Green on Hover */
+        }
+        #response {
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #extractedValues {
+            background-color: #f7f5f2; /* Very Light Brownish Background */
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #ddd;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+        .item {
+            background-color: #E8E1D9; /* Light Brown for items */
+            margin: 5px 0;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+        .item:hover {
+            background-color: #D1C3A2; /* Slightly Darker Brown on Hover */
+        }
+        .error {
+            color: #D32F2F; /* Red for errors */
+            font-weight: bold;
+        }
+        /* Loading Spinner Styles */
+        .spinner {
+            border: 4px solid #f3f3f3; /* Light gray */
+            border-top: 4px solid #6DBE45; /* Green */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 36%;
+            left: 48%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Transparent overlay to dim the background */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+            display: none; /* Hidden by default */
+            z-index: 999; /* Ensure it covers all content */
+        }
+
+        /* Hidden by default, shown during loading */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload an Image for Processing</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="file" name="image" accept="image/*" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <!-- Transparent Overlay -->
+    <div id="overlay" class="overlay hidden"></div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="spinner hidden"></div>
+
+    <div id="response">
+        <h2>Extracted Values:</h2>
+        <div id="extractedValues">Waiting for upload...</div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Show the loading spinner and overlay
+            document.getElementById('loadingSpinner').classList.remove('hidden');
+            document.getElementById('overlay').classList.remove('hidden');
+
+            // Get the form data
+            const formData = new FormData();
+            const fileInput = document.getElementById('file');
+            formData.append('image', fileInput.files[0]);
+
+            try {
+                // Send the form data to the server using fetch
+                const response = await fetch('https://b093-2001-448a-2098-588b-8841-7491-9f0-2452.ngrok-free.app/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('File upload failed');
+                }
+
+                // Parse the JSON response
+                const result = await response.json();
+
+                // Clear previous content
+                const extractedValuesDiv = document.getElementById('extractedValues');
+                extractedValuesDiv.innerHTML = '';
+
+                // Assuming the 'extractedValues' is an array of items
+                if (Array.isArray(result.extractedValues)) {
+                    // Loop through each extracted value and display it
+                    result.extractedValues.forEach(item => {
+                        const itemElement = document.createElement('div');
+                        itemElement.classList.add('item');
+                        itemElement.textContent = item;
+                        extractedValuesDiv.appendChild(itemElement);
+                    });
+                } else {
+                    extractedValuesDiv.textContent = 'No extracted values found.';
+                }
+            } catch (error) {
+                // If there is an error, show it in the 'response' div
+                const extractedValuesDiv = document.getElementById('extractedValues');
+                extractedValuesDiv.textContent = 'Error: ' + error.message;
+                extractedValuesDiv.classList.add('error');
+            } finally {
+                // Hide the loading spinner and overlay regardless of the outcome
+                document.getElementById('loadingSpinner').classList.add('hidden');
+                document.getElementById('overlay').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
