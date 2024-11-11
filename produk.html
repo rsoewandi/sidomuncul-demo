@@ -200,10 +200,10 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.result.result_image) {
+                if (data.result_image) {
                     // Show the result image after it's received
                     const resultImage = document.getElementById('resultImage1');
-                    resultImage.src = 'data:image/png;base64,' + data.result.result_image;
+                    resultImage.src = 'data:image/png;base64,' + data.result_image;
                     resultImage.style.display = 'block';  // Show the image
                 } else {
                     alert('Error: ' + data.error);
