@@ -162,9 +162,35 @@
                 width: 100%;
             }
         }
+        /* Navbar styling */
+        .navbar {
+            background-color: #6DBE45;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+        }
+
+        .navbar a:hover {
+            background-color: #5a9a3b;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
+    <!-- Navbar with two menu items -->
+    <div class="navbar">
+        <a href="/index.html">Reader Text</a>
+        <a href="/produk.html">Reader Product</a>
+    </div>
+
     <h1>Upload an Image for Processing</h1>
     <form id="uploadForm" enctype="multipart/form-data">
         <input type="file" id="file" name="image" accept="image/*" required>
