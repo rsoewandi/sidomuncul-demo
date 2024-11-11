@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Images</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            color: #333;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            background-color: #6DBE45;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+        }
+
+        .navbar a:hover {
+            background-color: #5a9a3b;
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #6DBE45;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tabs button {
+            background-color: #E8E1D9;
+            color: #333;
+            border: 2px solid #D1B49A;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .tabs button:hover {
+            background-color: #D1C3A2;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-size: 16px;
+            color: #555;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+            font-size: 14px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #D1B49A;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #6DBE45;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #5a9a3b;
+        }
+
+        hr {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+        }
+
+        #resultContainer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #resultImage {
+            display: none;
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .error {
+            color: #D32F2F;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 768px) {
+            .tabs button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+
+            input[type="file"] {
+                width: 100%;
+            }
+
+            #resultImage {
+                max-height: 400px;
+            }
+        }
+        
+        #resultImage1 {
+            display: none;
+            width: 60%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar with two menu items -->
+    <div class="navbar">
+        <a href="/index.html">Reader Text</a>
+        <a href="/produk.html">Reader Product</a>
+    </div>
+
+    <h1>Compare Images</h1>
+
+    <!-- Tabs for switching between forms -->
+
+    <div id="tab1" class="tab-content active">
+        <form id="compareForm1" enctype="multipart/form-data">
+            <label for="master_image1">Master Image:</label>
+            <input type="file" name="image1" id="image1" required><br>
+
+            <label for="images1">Images to Compare:</label>
+            <input type="file" name="image2" id="image2" required><br>
+
+            <input type="submit" value="Compare">
+        </form>
+
+        <hr>
+        <h2>Processed Image:</h2>
+        <div id="resultContainer1">
+            <!-- The result image will appear here -->
+            <img id="resultImage1" src="" alt="Result Image">
+        </div>
+    </div>
+
+    <script>
+        // Handle form submission for Form 1
+        document.getElementById('compareForm1').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData();
+            formData.append('image1', document.getElementById('image1').files[0]);
+            formData.append('image2', document.getElementById('image2').files[0]);
+
+            fetch('https://b093-2001-448a-2098-588b-8841-7491-9f0-2452.ngrok-free.apps/compare', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result.result_image) {
+                    // Show the result image after it's received
+                    const resultImage = document.getElementById('resultImage1');
+                    resultImage.src = 'data:image/png;base64,' + data.result.result_image;
+                    resultImage.style.display = 'block';  // Show the image
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('resultContainer1').innerHTML = '<p>Error comparing images. Please try again later.</p>';
+            });
+        });
+
+    </script>
+</body>
+</html>
