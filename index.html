@@ -11,8 +11,8 @@
             padding: 0;
             background-color: #f9f9f9;
             color: #333;
-            position: relative; /* Position relative to allow absolute positioning of spinner/overlay */
-            min-height: 100vh; /* Ensure full viewport height */
+            position: relative;
+            min-height: 100vh;
         }
         h1 {
             text-align: center;
@@ -91,8 +91,8 @@
             height: 40px;
             animation: spin 1s linear infinite;
             position: absolute;
-            top: 36%;
-            left: 48%;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
         }
 
@@ -117,6 +117,46 @@
         .hidden {
             display: none;
         }
+
+        /* Image Preview Styling */
+        #imagePreviewContainer {
+            display: none; /* Hide initially */
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            width: 17%;
+        }
+
+        #imagePreview {
+            width: 300px;
+            height: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Flex container for side-by-side layout */
+        #mainContent {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        /* Each section in the flex container */
+        .contentSection {
+            width: 45%;
+            margin: 10px;
+        }
+
+        /* For smaller screens */
+        @media (max-width: 768px) {
+            .contentSection {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -126,18 +166,47 @@
         <button type="submit">Upload</button>
     </form>
 
+    <!-- Main Content Container -->
+    <div id="mainContent">
+        <!-- Image Preview Section -->
+        <div class="contentSection"  id="imagePreviewContainer">
+            <h2>Uploaded Image:</h2>
+            <div>
+                <img id="imagePreview" alt="Image Preview" />
+            </div>
+        </div>
+
+        <!-- Extracted Values Section -->
+        <div class="contentSection">
+            <h2>Extracted Values:</h2>
+            <div id="extractedValues">Waiting for upload...</div>
+        </div>
+    </div>
+
     <!-- Transparent Overlay -->
     <div id="overlay" class="overlay hidden"></div>
 
     <!-- Loading Spinner -->
     <div id="loadingSpinner" class="spinner hidden"></div>
 
-    <div id="response">
-        <h2>Extracted Values:</h2>
-        <div id="extractedValues">Waiting for upload...</div>
-    </div>
-
     <script>
+        // Show image preview when a file is selected
+        document.getElementById('file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    preview.src = event.target.result;
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+
         document.getElementById('uploadForm').addEventListener('submit', async function (e) {
             e.preventDefault(); // Prevent the default form submission
 
@@ -177,9 +246,13 @@
                         itemElement.textContent = item;
                         extractedValuesDiv.appendChild(itemElement);
                     });
+                    imagePreviewContainer.style.display = 'block'; // Show the image preview once response is received
                 } else {
                     extractedValuesDiv.textContent = 'No extracted values found.';
                 }
+
+                // Show image preview after the response is received
+                document.getElementById('imagePreviewContainer').style.display = 'block';
             } catch (error) {
                 // If there is an error, show it in the 'response' div
                 const extractedValuesDiv = document.getElementById('extractedValues');
