@@ -156,6 +156,7 @@
         }
     </style>
 </head>
+<script src="script.js"></script>
 <body>
     <!-- Navbar with two menu items -->
     <div class="navbar">
@@ -194,7 +195,7 @@
             formData.append('image1', document.getElementById('image1').files[0]);
             formData.append('image2', document.getElementById('image2').files[0]);
 
-            fetch('https://9a46-2001-448a-2098-588b-6474-1836-e421-f55e.ngrok-free.app/compare', {
+            fetch(baseUrl+'/compare', {
                 method: 'POST',
                 body: formData
             })
